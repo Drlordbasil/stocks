@@ -3,35 +3,44 @@ import numpy as np
 import pandas as pd
 from typing import List, Dict
 
-def q_learning_stock_prediction(stock_symbols: List[str], actions: List[str], epsilon: float, alpha: float, gamma: float, 
-                               num_episodes: int, num_prediction_steps: int, reward_threshold: float) -> List[str]:
-    
-    q_table = {state: {action: 0 for action in actions} for state in stock_symbols}
-    
-    stock_data = {symbol: preprocess_data(yf.download(symbol)) for symbol in stock_symbols}
+
+def q_learning_stock_prediction(stock_symbols: List[str], actions: List[str], epsilon: float, alpha: float, gamma: float,
+                                num_episodes: int, num_prediction_steps: int, reward_threshold: float) -> List[str]:
+
+    q_table = {state: {action: 0 for action in actions}
+               for state in stock_symbols}
+
+    stock_data = {symbol: preprocess_data(
+        yf.download(symbol)) for symbol in stock_symbols}
 
     for _ in range(num_episodes):
         current_state = np.random.choice(stock_symbols)
 
         for _ in range(num_prediction_steps):
-            current_action = max(q_table[current_state], key=q_table[current_state].get)
-            
+            current_action = max(
+                q_table[current_state], key=q_table[current_state].get)
+
             if np.random.rand() < epsilon:
                 current_action = np.random.choice(actions)
 
-            predicted_state = simulate_stock_movement(current_state, current_action)
-            actual_state = get_actual_state(stock_data, current_state, num_prediction_steps)
-            reward = calculate_reward(predicted_state, actual_state, reward_threshold)
+            predicted_state = simulate_stock_movement(
+                current_state, current_action)
+            actual_state = get_actual_state(
+                stock_data, current_state, num_prediction_steps)
+            reward = calculate_reward(
+                predicted_state, actual_state, reward_threshold)
 
             q_table[current_state][current_action] = (1 - alpha) * q_table[current_state][current_action] + \
-                                                     alpha * (reward + gamma * max(q_table[predicted_state].values()))
+                alpha * (reward + gamma *
+                         max(q_table[predicted_state].values()))
             current_state = predicted_state
 
     predictions = []
     current_state = np.random.choice(stock_symbols)
 
     for _ in range(num_prediction_steps):
-        current_action = max(q_table[current_state], key=q_table[current_state].get)
+        current_action = max(q_table[current_state],
+                             key=q_table[current_state].get)
         predictions.append(current_action)
         current_state = simulate_stock_movement(current_state, current_action)
 
@@ -73,7 +82,8 @@ if __name__ == '__main__':
 
     actual_symbols = []
 
-    accuracy = sum(pred == actual for pred, actual in zip(predictions, actual_symbols)) / num_prediction_steps
+    accuracy = sum(pred == actual for pred, actual in zip(
+        predictions, actual_symbols)) / num_prediction_steps
 
     df = pd.DataFrame({'Actual': actual_symbols, 'Predicted': predictions})
     df.plot()
