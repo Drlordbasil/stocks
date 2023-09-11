@@ -30,9 +30,8 @@ def q_learning_stock_prediction(stock_symbols: List[str], actions: List[str], ep
             reward = calculate_reward(
                 predicted_state, actual_state, reward_threshold)
 
-            q_table[current_state][current_action] = (1 - alpha) * q_table[current_state][current_action] + \
-                alpha * (reward + gamma *
-                         max(q_table[predicted_state].values()))
+            q_table[current_state][current_action] = (
+                1 - alpha) * q_table[current_state][current_action] + alpha * (reward + gamma * max(q_table[predicted_state].values()))
             current_state = predicted_state
 
     predictions = []
@@ -54,15 +53,15 @@ def preprocess_data(data: pd.Series) -> np.ndarray:
 
 
 def simulate_stock_movement(current_state: str, action: str) -> str:
-    pass
+    return current_state  # Add implementation
 
 
 def get_actual_state(stock_data: Dict[str, pd.Series], current_state: str, prediction_steps: int) -> str:
-    pass
+    return current_state  # Add implementation
 
 
 def calculate_reward(predicted_state: str, actual_state: str, reward_threshold: float) -> float:
-    pass
+    return 0.0  # Add implementation
 
 
 if __name__ == '__main__':
